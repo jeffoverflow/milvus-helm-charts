@@ -28,7 +28,7 @@ spec:
       - name: datacoord
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
-        args: [ "/milvus/bin/milvus", "run", "dataservice" ]
+        args: [ "/milvus/bin/milvus", "run", "datacoord" ]
         env:
           - name: ETCD_ENDPOINTS
             value: "{{ template "milvus-ha.etcd.endpoints" . }}"

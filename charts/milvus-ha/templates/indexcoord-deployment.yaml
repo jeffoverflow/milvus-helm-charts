@@ -28,7 +28,7 @@ spec:
       - name: indexcoord
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
-        args: [ "/milvus/bin/milvus", "run", "indexservice" ]
+        args: [ "/milvus/bin/milvus", "run", "indexcoord" ]
         env:
           - name: MINIO_ADDRESS
             value: "{{ template "milvus-ha.minio.address" . }}"

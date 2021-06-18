@@ -28,7 +28,7 @@ spec:
       - name: proxy
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
-        args: [ "/milvus/bin/milvus", "run", "proxynode" ]
+        args: [ "/milvus/bin/milvus", "run", "proxy" ]
         env:
           - name: ETCD_ENDPOINTS
             value: "{{ template "milvus-ha.etcd.endpoints" . }}"
@@ -46,7 +46,7 @@ spec:
           {{- toYaml .Values.proxy.extraEnv | nindent 10 }}
         {{- end }}
         ports:
-          - name: proxy
+          - name: milvus
             containerPort: 19530
             protocol: TCP
           {{- if .Values.metrics.enabled }}

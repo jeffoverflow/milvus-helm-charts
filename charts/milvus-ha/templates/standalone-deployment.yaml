@@ -28,7 +28,7 @@ spec:
       - name: standalone
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
-        args: [ "/milvus/bin/standalone" ]
+        args: [ "/milvus/bin/milvus", "run", "standalone" ]
         env:
           - name: ETCD_ENDPOINTS
             value: "{{ template "milvus-ha.etcd.endpoints" . }}"
@@ -38,7 +38,7 @@ spec:
           {{- toYaml .Values.standalone.extraEnv | nindent 10 }}
         {{- end }}
         ports:
-          - name: standalone
+          - name: milvus
             containerPort: 19530
             protocol: TCP
           {{- if .Values.metrics.enabled }}
