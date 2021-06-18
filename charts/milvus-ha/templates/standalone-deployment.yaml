@@ -29,8 +29,12 @@ spec:
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
         args: [ "/milvus/bin/standalone" ]
-        {{- if .Values.standalone.extraEnv }}
         env:
+          - name: ETCD_ENDPOINTS
+            value: "{{ template "milvus-ha.etcd.endpoints" . }}"
+          - name: MINIO_ADDRESS
+            value: "{{ template "milvus-ha.minio.address" . }}"
+        {{- if .Values.standalone.extraEnv }}
           {{- toYaml .Values.standalone.extraEnv | nindent 10 }}
         {{- end }}
         ports:

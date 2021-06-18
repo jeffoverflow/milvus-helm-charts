@@ -104,6 +104,44 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{ template "milvus-ha.fullname" . }}-pulsar
 {{- end -}}
 
+{{/* etcd endpoints */}}
+{{- define "milvus-ha.etcd.endpoints" -}}
+{{- if .Values.externalEtcd.enabled -}}
+{{ join "," .Values.externalEtcd.endpoints }}
+{{- else -}}
+{{ .Release.Name }}-{{ .Values.etcd.name }}:{{ .Values.etcd.service.port }}
+{{- end -}}
+{{- end -}}
+
+{{/* minio address */}}
+{{- define "milvus-ha.minio.address" -}}
+{{- if .Values.externalMinio.enabled -}}
+{{ .Values.externalMinio.address }}:{{ .Values.externalMinio.port }}
+{{- else -}}
+{{ .Release.Name }}-{{ .Values.minio.name }}:{{ .Values.minio.service.port }}
+{{- end -}}
+{{- end -}}
+
+{{/* pulsar address */}}
+{{- define "milvus-ha.pulsar.address" -}}
+{{- if .Values.externalPulsar.enabled }}
+{{ .Values.externalPulsar.address }}:{{ .Values.externalPulsar.port }}
+{{- else if .Values.pulsar.enabled }}
+{{- $httpPort := "" -}}
+{{- $httpsPort := "" -}}
+{{- range .Values.pulsar.proxy.service.ports }}
+{{- if eq .name "pulsar" }}
+{{- $httpPort = .port -}}
+{{- else if eq .name "pulsarssl" }}
+{{- $httpsPort = .port -}}
+{{- end }}
+{{- end }}
+{{ .Release.Name }}-{{ .Values.pulsar.name }}-proxy:{{ $httpsPort | default $httpPort }}
+{{- else }}
+{{ template "milvus-ha.pulsar.fullname" . }}:{{ .Values.pulsarStandalone.service.port }}
+{{- end }}
+{{- end -}}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

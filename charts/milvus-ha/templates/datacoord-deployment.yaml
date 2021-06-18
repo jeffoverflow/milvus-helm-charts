@@ -29,8 +29,16 @@ spec:
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
         args: [ "/milvus/bin/milvus", "run", "dataservice" ]
-        {{- if .Values.dataCoordinator.extraEnv }}
         env:
+          - name: ETCD_ENDPOINTS
+            value: "{{ template "milvus-ha.etcd.endpoints" . }}"
+          - name: MINIO_ADDRESS
+            value: "{{ template "milvus-ha.minio.address" . }}"
+          - name: PULSAR_ADDRESS
+            value: "pulsar://{{ template "milvus-ha.pulsar.address" . }}"
+          - name: MASTER_ADDRESS
+            value: "{{ template "milvus-ha.rootcoord.fullname" . }}:{{ .Values.rootCoordinator.service.port }}"
+        {{- if .Values.dataCoordinator.extraEnv }}
           {{- toYaml .Values.dataCoordinator.extraEnv | nindent 10 }}
         {{- end }}
         ports:

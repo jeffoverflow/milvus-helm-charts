@@ -10,103 +10,24 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under the License.
 
-nodeID: # will be deprecated later
-  queryNodeIDList: [1]
-
 etcd:
-{{- if .Values.externalEtcd.enabled }}
-  endpoints:
-  {{- range .Values.externalEtcd.endpoints }}
-    - {{ . }}
-  {{- end }}
-{{- else }}
-  endpoints:
-    - {{ .Release.Name }}-{{ .Values.etcd.name }}:{{ .Values.etcd.service.port }}
-{{- end }}
   rootPath: by-dev
   metaSubPath: meta # metaRootPath = rootPath + '/' + metaSubPath
   kvSubPath: kv # kvRootPath = rootPath + '/' + kvSubPath
 
 minio:
 {{- if .Values.externalMinio.enabled }}
-  address: {{ .Values.externalMinio.address }}
-  port: {{ .Values.externalMinio.port }}
   accessKeyID: {{ .Values.externalMinio.accessKey }}
   secretAccessKey: {{ .Values.externalMinio.secretKey }}
 {{- else }}
-  address: {{ .Release.Name }}-{{ .Values.minio.name }}
-  port: {{ .Values.minio.service.port }}
   accessKeyID: {{ .Values.minio.accessKey }}
   secretAccessKey: {{ .Values.minio.secretKey }}
 {{- end }}
   useSSL: false
   bucketName: "a-bucket"
 
-pulsar:
-{{- if .Values.externalPulsar.enabled }}
-  address: {{ .Values.externalPulsar.address }}
-  port: {{ .Values.externalPulsar.port }}
-{{- else if .Values.pulsar.enabled }}
-  address: {{ .Release.Name }}-{{ .Values.pulsar.name }}-proxy
-  {{- $httpPort := "" -}}
-  {{- $httpsPort := "" -}}
-  {{- range .Values.pulsar.proxy.service.ports }}
-  {{- if eq .name "pulsar" }}
-  {{- $httpPort = .port -}}
-  {{- else if eq .name "pulsarssl" }}
-  {{- $httpsPort = .port -}}
-  {{- end }}
-  {{- end }}
-  port: {{ $httpsPort | default $httpPort }}
-{{- else }}
-  address: {{ template "milvus-ha.pulsar.fullname" . }}
-  port: {{ .Values.pulsarStandalone.service.port }}
-{{- end }}
-
-master:
-{{- if not .Values.standalone.enabled }}
-  address: {{ template "milvus-ha.rootcoord.fullname" . }}
-{{- else }}
-  address: localhost
-{{- end }}
-  port: {{ .Values.rootCoordinator.service.port }}
-
-proxyNode:
-  port: 19530
-
-queryService:
-{{- if not .Values.standalone.enabled }}
-  address: {{ template "milvus-ha.querycoord.fullname" . }}
-{{- else }}
-  address: localhost
-{{- end }}
-  port: {{ .Values.queryCoordinator.service.port }}
-
 queryNode:
   gracefulTime: 5000 #ms
-  port: 21123
-
-indexService:
-{{- if not .Values.standalone.enabled }}
-  address: {{ template "milvus-ha.indexcoord.fullname" . }}
-{{- else }}
-  address: localhost
-{{- end }}
-  port: {{ .Values.indexCoordinator.service.port }}
-
-indexNode:
-  port: 21121
-
-dataService:
-{{- if not .Values.standalone.enabled }}
-  address: {{ template "milvus-ha.datacoord.fullname" . }}
-{{- else }}
-  address: localhost
-{{- end }}
-  port: {{ .Values.dataCoordinator.service.port }}
-
-dataNode:
-  port: 21124
 
 log:
   level: {{ .Values.log.level }}

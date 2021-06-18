@@ -29,13 +29,22 @@ spec:
         image: "{{ .Values.image.all.repository }}:{{ .Values.image.all.tag }}"
         imagePullPolicy: {{ .Values.image.all.pullPolicy }}
         args: [ "/milvus/bin/milvus", "run", "querynode" ]
-        {{- if .Values.querynode.extraEnv }}
         env:
+          - name: MINIO_ADDRESS
+            value: "{{ template "milvus-ha.minio.address" . }}"
+          - name: PULSAR_ADDRESS
+            value: "pulsar://{{ template "milvus-ha.pulsar.address" . }}"
+          - name: MASTER_ADDRESS
+            value: "{{ template "milvus-ha.rootcoord.fullname" . }}:{{ .Values.rootCoordinator.service.port }}"
+          - name: DATA_SERVICE_ADDRESS
+            value: "{{ template "milvus-ha.datacoord.fullname" . }}:{{ .Values.dataCoordinator.service.port }}"
+          - name: INDEX_SERVICE_ADDRESS
+            value: "{{ template "milvus-ha.indexcoord.fullname" . }}:{{ .Values.indexCoordinator.service.port }}"
+          - name: QUERY_SERVICE_ADDRESS
+            value: "{{ template "milvus-ha.querycoord.fullname" . }}:{{ .Values.queryCoordinator.service.port }}"
+        {{- if .Values.querynode.extraEnv }}
           {{- toYaml .Values.querynode.extraEnv | nindent 10 }}
         {{- end }}
-        env:
-        - name: QUERY_NODE_ID
-          value: "1"
         ports:
           - name: querynode
             containerPort: 21123
