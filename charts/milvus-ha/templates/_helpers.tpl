@@ -124,22 +124,22 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{/* pulsar address */}}
 {{- define "milvus-ha.pulsar.address" -}}
-{{- if .Values.externalPulsar.enabled }}
+{{- if .Values.externalPulsar.enabled -}}
 {{ .Values.externalPulsar.address }}:{{ .Values.externalPulsar.port }}
-{{- else if .Values.pulsar.enabled }}
+{{- else if .Values.pulsar.enabled -}}
 {{- $httpPort := "" -}}
 {{- $httpsPort := "" -}}
-{{- range .Values.pulsar.proxy.service.ports }}
-{{- if eq .name "pulsar" }}
+{{- range .Values.pulsar.proxy.service.ports -}}
+{{- if eq .name "pulsar" -}}
 {{- $httpPort = .port -}}
-{{- else if eq .name "pulsarssl" }}
+{{- else if eq .name "pulsarssl" -}}
 {{- $httpsPort = .port -}}
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
 {{ .Release.Name }}-{{ .Values.pulsar.name }}-proxy:{{ $httpsPort | default $httpPort }}
-{{- else }}
+{{- else -}}
 {{ template "milvus-ha.pulsar.fullname" . }}:{{ .Values.pulsarStandalone.service.port }}
-{{- end }}
+{{- end -}}
 {{- end -}}
 
 {{/*
